@@ -37,7 +37,7 @@ const MovieDetail = () => {
   if (!movie) return <div className="text-center text-white py-12">Movie not found</div>;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-20">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1">
           <img

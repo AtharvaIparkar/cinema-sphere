@@ -29,7 +29,31 @@ function App() {
   }
 
   return (
-    <ClerkProvider publishableKey={clerkPubKey}>
+    <ClerkProvider 
+      publishableKey={clerkPubKey}
+      appearance={{
+        baseTheme: "dark",
+        variables: {
+          colorPrimary: "#dc2626",
+          colorBackground: "#111827",
+          colorInputBackground: "#374151",
+          colorInputText: "#ffffff",
+          colorText: "#ffffff",
+          colorTextSecondary: "#ffffff"
+        },
+        elements: {
+          card: "bg-gray-900 border-gray-700",
+          headerTitle: "text-white",
+          headerSubtitle: "text-white",
+          formButtonPrimary: "bg-red-600 hover:bg-red-700 text-white",
+          formFieldLabel: "text-white",
+          formFieldInput: "text-white bg-gray-800 border-gray-600",
+          footerActionLink: "text-white hover:text-gray-300",
+          modalContent: "bg-gray-900 text-white",
+          modalCloseButton: "text-white hover:text-gray-300"
+        }
+      }}
+    >
       <Router>
         <div className="min-h-screen bg-slate-900">
           <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />

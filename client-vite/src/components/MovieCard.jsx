@@ -1,68 +1,103 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const MovieCard = ({ movie }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
   return (
-    <Link to={`/movie/${movie._id}`} className="group">
-      <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group-hover:-translate-y-2">
-        <div className="relative">
+    <Link to={`/movie/${movie._id}`} className="group block h-full">
+      <div className="relative bg-gray-800 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-black/50 h-full flex flex-col">
+        {/* Movie Poster */}
+        <div className="relative aspect-[2.5/3] overflow-hidden">
+          {!imageLoaded && !imageError && (
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 animate-pulse flex items-center justify-center">
+              <div className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+          
           <img
-            src={movie.thumbnail}
+            src={imageError ? 'https://via.placeholder.com/400x600/1f2937/9ca3af?text=No+Image' : movie.thumbnail}
             alt={movie.title}
-            className="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-500"
+            onLoad={() => setImageLoaded(true)}
+            onError={() => {
+              setImageError(true);
+              setImageLoaded(true);
+            }}
+            className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${
+              imageLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
           />
+          
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          
+          {/* Rating Badge */}
+          {movie.rating && (
+            <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded-lg text-sm font-semibold flex items-center space-x-1">
+              <svg className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              <span>{movie.rating.toFixed(1)}</span>
+            </div>
+          )}
+
+          {/* Source Badge */}
+          {movie.source && (
+            <div className={`absolute top-3 left-3 px-2 py-1 rounded-lg text-xs font-bold ${
+              movie.source === 'TMDB' 
+                ? 'bg-blue-600 text-white' 
+                : movie.source === 'OMDB'
+                ? 'bg-yellow-600 text-white'
+                : 'bg-green-600 text-white'
+            }`}>
+              {movie.source}
+            </div>
+          )}
+
+          {/* Play Button Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-6">
-            <div className="bg-white text-orange-600 px-6 py-3 rounded-full font-bold shadow-lg">
+            <div className="bg-white/85 backdrop-blur-xl text-orange-600 px-6 py-3 rounded-full font-bold shadow-lg">
               ▶ Watch Now
             </div>
           </div>
-          <div className="absolute top-4 right-4 flex flex-col gap-2">
-            {movie.rating && (
-              <div className="bg-white/90 backdrop-blur-sm text-slate-700 px-3 py-1 rounded-full text-sm font-medium">
-                ⭐ {movie.rating.toFixed(1)}
-              </div>
-            )}
-            {movie.source && (
-              <div className={`px-3 py-1 rounded-full text-xs font-bold ${
-                movie.source === 'TMDB' 
-                  ? 'bg-blue-500 text-white' 
-                  : movie.source === 'OMDB'
-                  ? 'bg-yellow-500 text-black'
-                  : 'bg-green-500 text-white'
-              }`}>
-                {movie.source}
-              </div>
-            )}
-          </div>
         </div>
-        <div className="p-6">
-          <h3 className="text-xl font-bold text-slate-800 mb-2 truncate group-hover:text-orange-600 transition-colors">{movie.title}</h3>
-          <p className="text-slate-500 text-sm mb-3 font-medium">{movie.genre} • {movie.releaseYear}</p>
-          <p className="text-slate-600 text-sm line-clamp-2 leading-relaxed">{movie.description}</p>
-          <div className="mt-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="text-sm text-emerald-600 font-semibold">
-                🎬 Stream Ready
-              </div>
-              {movie.source && (
-                <div className={`text-xs px-2 py-1 rounded font-medium ${
-                  movie.source === 'TMDB' 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : movie.source === 'OMDB'
-                    ? 'bg-yellow-100 text-yellow-700'
-                    : 'bg-green-100 text-green-700'
-                }`}>
-                  {movie.source}
-                </div>
-              )}
+
+        {/* Movie Info */}
+        <div className="p-4 space-y-3 flex-1 flex flex-col">
+          {/* Title */}
+          <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 group-hover:text-red-400 transition-colors duration-200">
+            {movie.title}
+          </h3>
+          
+          {/* Genre & Year */}
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-400 font-medium">{movie.genre}</span>
+            <span className="text-gray-500">{movie.releaseYear}</span>
+          </div>
+          
+          {/* Description */}
+          <p className="text-gray-400 text-sm line-clamp-2 leading-relaxed flex-1">
+            {movie.description}
+          </p>
+          
+          {/* Action Bar */}
+          <div className="flex items-center justify-between pt-2 mt-auto">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-green-400 text-xs font-semibold">Available</span>
             </div>
-            <div className="text-orange-600 group-hover:translate-x-1 transition-transform duration-300">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </div>
           </div>
         </div>
+
+        {/* Hover Border Effect */}
+        <div className="absolute inset-0 rounded-2xl ring-2 ring-red-600/0 group-hover:ring-red-600/50 transition-all duration-300 pointer-events-none"></div>
       </div>
     </Link>
   );
