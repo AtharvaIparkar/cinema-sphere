@@ -60,8 +60,8 @@ const Home = ({ searchTerm }) => {
       onClick={onClick}
       className={`px-4 sm:px-6 py-2 sm:py-3 rounded-full font-medium transition-all duration-300 text-sm sm:text-base ${
         active
-          ? `bg-${color}-600 text-white shadow-lg transform scale-105`
-          : 'bg-white text-slate-600 hover:bg-gray-50 hover:text-orange-600 shadow-md hover:shadow-lg'
+          ? `bg-${color}-600 text-white shadow-lg transform scale-105 border-2 border-orange-400`
+          : 'bg-white text-slate-600 hover:bg-gray-50 hover:text-orange-600 shadow-md hover:shadow-lg border-2 border-transparent hover:border-orange-300'
       }`}
     >
       {children}

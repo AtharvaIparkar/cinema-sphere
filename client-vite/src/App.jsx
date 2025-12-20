@@ -5,6 +5,8 @@ import Navbar from './components/Navbar.jsx';
 import Home from './pages/Home.jsx';
 import MovieDetail from './pages/MovieDetail.jsx';
 import Profile from './pages/Profile.jsx';
+import About from './pages/About.jsx';
+import Blog from './pages/Blog.jsx';
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -61,6 +63,8 @@ function App() {
             <Route path="/" element={<Home searchTerm={searchTerm} />} />
             <Route path="/movie/:id" element={<MovieDetail />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/blog" element={<Blog />} />
           </Routes>
         </div>
       </Router>

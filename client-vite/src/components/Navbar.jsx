@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { SignedIn, SignedOut, UserButton, SignInButton } from '@clerk/clerk-react';
 
 const Navbar = ({ searchTerm, setSearchTerm }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 0);
@@ -13,25 +15,42 @@ const Navbar = ({ searchTerm, setSearchTerm }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+  };
+
+  const handleSearchSubmit = () => {
+    setIsMobileMenuOpen(false);
+    if (searchTerm && location.pathname !== '/') {
+      navigate('/');
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearchSubmit();
+    }
+  };
+
   const navLinks = [
-    { to: '/', label: 'Home', onClick: () => setSearchTerm('') },
-    { to: '/blog', label: 'Blog' },
-    { to: '/about', label: 'About' }
+    { to: '/', label: 'Home', onClick: () => { setSearchTerm(''); setIsMobileMenuOpen(false); } },
+    { to: '/blog', label: 'Blog', onClick: () => setIsMobileMenuOpen(false) },
+    { to: '/about', label: 'About', onClick: () => setIsMobileMenuOpen(false) }
   ];
 
   const NavLink = ({ to, label, onClick, mobile = false }) => (
     <Link 
       to={to}
       onClick={onClick}
-      className={`relative font-medium transition-colors duration-200 group ${
+      className={`relative font-medium transition-all duration-200 group ${
         mobile 
-          ? 'block px-3 py-2 text-white hover:text-red-400' 
-          : 'text-gray-300 hover:text-white'
+          ? 'block px-3 py-3 text-white hover:text-red-400 hover:bg-white/5 rounded-lg' 
+          : 'text-gray-300 hover:text-white px-3 py-2'
       }`}
     >
       {label}
       {!mobile && (
-        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-600 transition-all duration-200 group-hover:w-full" />
+        <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-red-600 to-orange-600 transition-all duration-200 group-hover:w-full" />
       )}
     </Link>
   );
@@ -48,10 +67,10 @@ const Navbar = ({ searchTerm, setSearchTerm }) => {
           {/* Brand */}
           <Link 
             to="/" 
-            onClick={() => setSearchTerm('')}
+            onClick={() => { setSearchTerm(''); setIsMobileMenuOpen(false); }}
             className="flex items-center space-x-2 sm:space-x-3 transition-transform duration-200 hover:scale-105"
           >
-            <span className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            <span className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
               CinemaSphere
             </span>
           </Link>
@@ -79,15 +98,24 @@ const Navbar = ({ searchTerm, setSearchTerm }) => {
                 type="text"
                 placeholder="Search movies..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => handleSearch(e.target.value)}
+                onKeyPress={handleKeyPress}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
-                className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2 sm:py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all duration-200 hover:bg-white/15 text-sm sm:text-base"
+                className="w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-2 sm:py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all duration-200 hover:bg-white/15 text-sm sm:text-base"
               />
+              <button
+                onClick={handleSearchSubmit}
+                className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
+              >
+                <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
+                  className="absolute inset-y-0 right-8 sm:right-12 pr-2 flex items-center text-gray-400 hover:text-white transition-colors"
                 >
                   <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -143,55 +171,114 @@ const Navbar = ({ searchTerm, setSearchTerm }) => {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-gray-300 hover:text-white transition-colors"
+              className="md:hidden relative p-3 rounded-xl bg-transparent text-gray-300 hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+              aria-label="Toggle mobile menu"
             >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              <div className="w-6 h-6 flex flex-col justify-center items-center space-y-1">
+                <span className={`block h-0.5 w-6 bg-current transform transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`} />
+                <span className={`block h-0.5 w-6 bg-current transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : 'opacity-100'}`} />
+                <span className={`block h-0.5 w-6 bg-current transform transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`} />
+              </div>
             </button>
           </div>
         </div>
 
         {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden bg-black/95 backdrop-blur-md border-t border-gray-700">
-            <div className="px-2 pt-2 pb-3 space-y-1">
+        <div className={`md:hidden transition-all duration-500 ease-in-out overflow-hidden ${
+          isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+        }`}>
+          <div className="bg-gradient-to-b from-black/95 via-slate-900/95 to-black/95 backdrop-blur-xl rounded-b-3xl border-t border-gradient-to-r from-red-600/30 to-orange-600/30 shadow-2xl">
+            <div className="px-6 py-8 space-y-6">
               
               {/* Mobile Search */}
-              <div className="px-3 py-2">
-                <div className="relative">
+              <div className="mb-8">
+                <div className="relative group">
                   <input
                     type="text"
                     placeholder="Search movies..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600"
+                    onChange={(e) => handleSearch(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    className="w-full pl-14 pr-20 py-4 bg-transparent from-white/10 to-white/5 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500/50 transition-all duration-300 hover:bg-white/15 text-lg shadow-lg focus:shadow-xl"
                   />
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                    <svg className="h-6 w-6 text-gray-400 group-focus-within:text-red-400 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </div>
+                  <button
+                    onClick={handleSearchSubmit}
+                    className="absolute inset-y-0 right-0 pr-5 flex items-center text-gray-400 hover:text-red-400 transition-all duration-300"
+                  >
+                    <div className="p-2.5 rounded-full bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 hover:border-red-600/50 transition-all duration-300 hover:scale-110">
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                  </button>
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm('')}
+                      className="absolute inset-y-0 right-16 pr-2 flex items-center text-gray-400 hover:text-white transition-colors duration-300"
+                    >
+                      <div className="p-1.5 rounded-full hover:bg-white/10 transition-all duration-300">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </div>
+                    </button>
+                  )}
                 </div>
               </div>
 
               {/* Mobile Navigation Links */}
-              {navLinks.map((link) => (
-                <NavLink key={link.to} {...link} mobile />
-              ))}
+              <div className="space-y-3">
+                {navLinks.map((link, index) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    onClick={link.onClick}
+                    className="group flex items-center px-5 py-4 text-white hover:text-red-400 bg-gradient-to-r from-white/5 to-transparent hover:from-red-600/10 hover:to-orange-600/10 rounded-2xl font-medium transition-all duration-300 transform hover:scale-105 border border-white/10 hover:border-red-600/30 backdrop-blur-sm shadow-lg hover:shadow-xl"
+                  >
+                    <div className="w-10 h-10 mr-4 rounded-xl bg-gradient-to-br from-red-600/20 to-orange-600/20 border border-red-600/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      {index === 0 && <span className="text-red-400 text-xl">🏠</span>}
+                      {index === 1 && <span className="text-orange-400 text-xl">📝</span>}
+                      {index === 2 && <span className="text-yellow-400 text-xl">ℹ️</span>}
+                    </div>
+                    <span className="text-lg font-semibold flex-1">{link.label}</span>
+                    <svg className="w-5 h-5 text-gray-400 group-hover:text-red-400 transform group-hover:translate-x-1 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                ))}
+              </div>
               
               {/* Mobile Profile Link */}
               <SignedIn>
                 <Link 
                   to="/profile" 
-                  className="block px-3 py-2 text-white hover:text-red-400 font-medium"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="group flex items-center px-5 py-4 text-white hover:text-red-400 bg-gradient-to-r from-white/5 to-transparent hover:from-blue-600/10 hover:to-purple-600/10 rounded-2xl font-medium transition-all duration-300 transform hover:scale-105 border border-white/10 hover:border-blue-600/30 backdrop-blur-sm shadow-lg hover:shadow-xl"
                 >
-                  Profile
+                  <div className="w-10 h-10 mr-4 rounded-xl bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-blue-600/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-blue-400 text-xl">👤</span>
+                  </div>
+                  <span className="text-lg font-semibold flex-1">Profile</span>
+                  <svg className="w-5 h-5 text-gray-400 group-hover:text-blue-400 transform group-hover:translate-x-1 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
                 </Link>
               </SignedIn>
+
+              {/* Decorative Bottom Border */}
+              <div className="pt-4 mt-6 border-t border-gradient-to-r from-transparent via-white/20 to-transparent">
+                <div className="flex justify-center">
+                  <div className="w-12 h-1 bg-gradient-to-r from-red-600 to-orange-600 rounded-full"></div>
+                </div>
+              </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );
