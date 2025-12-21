@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useUser, SignInButton } from '@clerk/clerk-react';
 import axios from 'axios';
 import Loading from '../components/Loading.jsx';
+import { getApiUrl } from '../config/api.js';
 
 const MovieDetail = () => {
   const { id } = useParams();
@@ -16,7 +17,7 @@ const MovieDetail = () => {
 
   const fetchMovie = async () => {
     try {
-      const response = await axios.get(`/api/movies/${id}`);
+      const response = await axios.get(getApiUrl(`/movies/${id}`));
       setMovie(response.data);
     } catch (error) {
       console.error('Error fetching movie:', error);
