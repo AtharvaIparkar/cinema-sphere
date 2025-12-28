@@ -3,7 +3,7 @@
 
 const movies = require('./_data/movies');
 
-export default function handler(req, res) {
+module.exports = function handler(req, res) {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -35,4 +35,4 @@ export default function handler(req, res) {
         console.error('Error in /api/movies:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
-}
+};
