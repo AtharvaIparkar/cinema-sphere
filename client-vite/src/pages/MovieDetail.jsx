@@ -53,7 +53,7 @@ const MovieDetail = () => {
   );
 
   const ServerButton = ({ onClick, color, children }) => (
-    <button 
+    <button
       onClick={onClick}
       className={`bg-${color}-600 text-white px-3 py-1 rounded text-sm hover:bg-${color}-700 transition-colors`}
     >
@@ -80,11 +80,11 @@ const MovieDetail = () => {
             className="w-full rounded-lg shadow-lg"
           />
         </div>
-        
+
         {/* Movie Information */}
         <div className="lg:col-span-2">
           <h1 className="text-4xl font-bold text-white mb-4">{movie.title}</h1>
-          
+
           <div className="text-white space-y-6">
             {/* Metadata Pills */}
             <div className="flex flex-wrap gap-3">
@@ -110,7 +110,7 @@ const MovieDetail = () => {
                   className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-3"
                 >
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7"/>
+                    <path d="M8 5v14l11-7" />
                   </svg>
                   Watch Now
                 </button>
@@ -119,12 +119,12 @@ const MovieDetail = () => {
           </div>
 
           {/* Movie Player */}
-          {isSignedIn && (
+          {isSignedIn && movie.tmdbId && (
             <div id="movie-player" className="bg-slate-800 rounded-lg p-4 mb-6">
               <h3 className="text-xl font-semibold text-white mb-4">🎬 Watch Full Movie</h3>
               <div className="aspect-video">
                 <iframe
-                  src={`https://multiembed.mov/?video_id=${movie.tmdbId || movie._id}&tmdb=1`}
+                  src={`https://multiembed.mov/?video_id=${movie.tmdbId}&tmdb=1`}
                   title={`Watch ${movie.title}`}
                   className="w-full h-full rounded-lg"
                   allowFullScreen
@@ -132,29 +132,40 @@ const MovieDetail = () => {
                 />
               </div>
               <div className="mt-4 flex gap-2 flex-wrap">
-                <ServerButton 
-                  onClick={() => changeServer(`https://multiembed.mov/?video_id=${movie.tmdbId || movie._id}&tmdb=1`)}
+                <ServerButton
+                  onClick={() => changeServer(`https://multiembed.mov/?video_id=${movie.tmdbId}&tmdb=1`)}
                   color="blue"
                 >
                   Server 1
                 </ServerButton>
-                <ServerButton 
-                  onClick={() => changeServer(`https://vidsrc.to/embed/movie/${movie.tmdbId || movie._id}`)}
+                <ServerButton
+                  onClick={() => changeServer(`https://vidsrc.to/embed/movie/${movie.tmdbId}`)}
                   color="green"
                 >
                   Server 2
                 </ServerButton>
-                <ServerButton 
-                  onClick={() => changeServer(`https://www.2embed.cc/embed/${movie.tmdbId || movie._id}`)}
+                <ServerButton
+                  onClick={() => changeServer(`https://www.2embed.cc/embed/${movie.tmdbId}`)}
                   color="purple"
                 >
                   Server 3
                 </ServerButton>
               </div>
               <p className="text-gray-400 text-sm mt-2">
-                Kindly use the vipstream-B from the servers list to watch the movie.<br/>
+                Kindly use the vipstream-B from the servers list to watch the movie.<br />
                 Try different servers if one doesn't work. Enjoying the movie? Add it to your watchlist!
               </p>
+            </div>
+          )}
+          {isSignedIn && !movie.tmdbId && (
+            <div id="movie-player" className="bg-slate-800 rounded-lg p-4 mb-6">
+              <h3 className="text-xl font-semibold text-white mb-4">🎬 Watch Full Movie</h3>
+              <div className="aspect-video bg-slate-700 rounded-lg flex items-center justify-center">
+                <p className="text-gray-400 text-center">
+                  Streaming is not available for this movie.<br />
+                  <span className="text-sm">Missing TMDB ID: {movie._id}</span>
+                </p>
+              </div>
             </div>
           )}
           {/* Trailer Section */}
@@ -189,7 +200,7 @@ const MovieDetail = () => {
                   <SignInButton mode="modal">
                     <button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 inline-flex items-center gap-3">
                       <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z"/>
+                        <path d="M8 5v14l11-7z" />
                       </svg>
                       Start Watching Now
                     </button>
