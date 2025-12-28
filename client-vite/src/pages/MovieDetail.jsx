@@ -17,6 +17,8 @@ const MovieDetail = () => {
   const fetchMovie = async () => {
     try {
       const response = await axios.get(`/api/movies/${id}`);
+      console.log('Movie data received:', response.data);
+      console.log('tmdbId:', response.data.tmdbId);
       setMovie(response.data);
     } catch (error) {
       console.error('Error fetching movie:', error);
